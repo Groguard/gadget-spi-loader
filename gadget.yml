@@ -1,0 +1,16 @@
+spec: "0.0"
+name: gadget-spi-loader
+uuid: 61a15157-d3ba-4466-bbce-01aa708a47e9
+type: docker
+onboot:
+- name: spi-loader
+  uuid: 1861fdfb-4d28-40f6-befa-2bccc26c08aa
+  image: 
+  directory: "./"
+  net: ""
+  readonly: false
+  command: ['/bin/sh','spiselect.sh']
+  binds: ['/sys:/sys']
+  capabilities: [SYS_RAWIO]
+  devices: []
+services: []
