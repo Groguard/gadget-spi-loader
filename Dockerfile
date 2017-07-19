@@ -1,11 +1,5 @@
 # ALPINE LINUX ARM WOOO!
-FROM armhf/alpine
-
-# WORKDIR
-WORKDIR /app
-
-# ADD SCRIPT
-ADD spiselect.sh /app
+FROM armhf/alpine as build
 
 # Install tools needed to download and build the CHIP_IO library from source.
 RUN apk update && apk add make && apk add gcc && apk add g++ && \
@@ -23,10 +17,15 @@ RUN apk update && apk add make && apk add gcc && apk add g++ && \
         mkdir -p /lib/firmware/nextthingco/chip/ && \
         mkdir -p /lib/firmware/nextthingco/chip/early/ && \
         cp samples/*.dtbo /lib/firmware/nextthingco/chip/ && \
-        cp firmware/early/*.dtbo /lib/firmware/nextthingco/chip/early/ && \
-        cd ../ && rm -rf CHIP-dt-overlays && \
-        # Remove build tools, which are no longer needed after installation
-        apk del git && apk del make && apk del gcc && apk del g++ && apk del flex && apk del bison
+        cp firmware/early/*.dtbo /lib/firmware/nextthingco/chip/early/
 
-CMD ["/bin/sh", "spiselect.sh"]
+
+# COPY build artifacts to new image
+
+FROM arm32v7/busybox
+
+COPY --from=build /lib/firmware/nextthingco /lib/firmware/nextthingco
+ADD spiselect.sh /
+
+CMD ["/bin/sh", "/spiselect.sh"]
 
